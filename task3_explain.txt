@@ -1,0 +1,6 @@
+
+
+
+I handled the keyword variations in the following way. Since the key word is not case sensitive.
+I converted the anchor text, the href, the keyword to lowercase, using .lower() in Python.
+

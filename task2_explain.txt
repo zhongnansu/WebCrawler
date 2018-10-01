@@ -1,0 +1,7 @@
+
+For merging the results.When I crawed the url, I keep 3 parameters after, sperated by "\t".
+The first is depth. Second is distance towards the page it belongs to.
+The third is the number of pages we have crawed so far.
+The sorting criteria is the sum of these 3 paramenters for one url.
+I wrote shell scipt named task2.sh to deal with data. Including sorting and de-duplicate.
+Finally I take the first 1000 url as the final result, saved in task2.txt
