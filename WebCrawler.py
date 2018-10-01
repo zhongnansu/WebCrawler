@@ -4,14 +4,22 @@ import requests
 from collections import deque
 import os
 
-THRESHOLD = 1000
+
+TASK = input("Give the task name:\n")
+seed_url = input("give a seed url:\n")
+KEYWORD = input("Give the keyword, if you don't want focus search, press enter\n")
+COUNT_THRESHOLD = int(input("How many urls do you want to crawl at most?\n"))
+DEPTH_THRESHOLD = int(input("How many depth do you want to crawl at most?\n"))
+if input("Do you want to save the raw html?[y]/[n]\n").lower() == "y":
+    SAVE_HTML_FLAG = True
+else:
+    SAVE_HTML_FLAG = False
+
+
 PREFIX = "https://en.wikipedia.org"
-KEYWORD = "task3"
-url_path = os.getcwd() + '/' + KEYWORD + '.txt'
-html_folder_path = path = os.getcwd() + "/" + KEYWORD + "_folder"
-seed_url_1 = "https://en.wikipedia.org/wiki/Time_zone"
-seed_url_2 = "https://en.wikipedia.org/wiki/Electric_car"
-seed_url_3 = "https://en.wikipedia.org/wiki/Carbon_footprint"
+# seed_url_1 = "https://en.wikipedia.org/wiki/Time_zone"
+# seed_url_2 = "https://en.wikipedia.org/wiki/Electric_car"
+# seed_url_3 = "https://en.wikipedia.org/wiki/Carbon_footprint"
 
 
 def bfs(seed, keyword):
@@ -29,9 +37,10 @@ def bfs(seed, keyword):
     depth = 1
     url_index = 1
 
-    while len(q) != 0 and depth <= 6:
+    while len(q) != 0 and depth <= DEPTH_THRESHOLD:
         size = len(q)
-        print("size is " + str(size))
+
+        print("Start Crawling...")
         for i in range(0, size):
             cur = q.pop()
             response = requests.get(cur).text
@@ -62,7 +71,7 @@ def bfs(seed, keyword):
                     redirect = sp(redirect_page, "html.parser")
                     url = redirect.find("link", rel="canonical").get("href")
 
-                if count < THRESHOLD and url not in result_url:
+                if count < COUNT_THRESHOLD and url not in result_url:
                     if not is_focus or has_keyword(keyword, item, url):
                         result_url.append(url)
                         q.appendleft(url)
@@ -73,18 +82,23 @@ def bfs(seed, keyword):
                         print("depth is " + str(depth))
                         print("count is " + str(count))
 
-                elif count == THRESHOLD:
+                elif count == COUNT_THRESHOLD:
+                    print("Url counts restriction, End Crawling...")
                     write_to_txt(result_url, parameter_list)
-                    #save_html(result_url)
+                    if SAVE_HTML_FLAG:
+                        save_html(result_url)
                     return 0
 
             url_index += 1
         depth += 1
-
+    print("Depth restriction, End Crawling...")
     write_to_txt(result_url, parameter_list)
+    if SAVE_HTML_FLAG:
+        save_html(result_url)
 
 
 def write_to_txt(result, parameter):
+    url_path = os.getcwd() + '/' + TASK + '.txt'
     f_url = open(url_path, "w")
     num = 0
     for i in result:
@@ -92,9 +106,11 @@ def write_to_txt(result, parameter):
         num += 1
 
     f_url.close()
+    print("Finished write to txt")
 
 
 def save_html(result_url):
+    html_folder_path = os.getcwd() + "/" + TASK + "_folder"
     os.mkdir(html_folder_path)
     index = 1
     print("Save html Begin...")
@@ -120,13 +136,5 @@ def has_keyword(keyword, item, url):
         return False
 
 
-bfs(seed_url_3, "green")
-
-# response = requests.get(seed_url_1).text
-# root = sp(response, "html.parser")
-# content = root.find('div', id='bodyContent')
-# tables = content.findAll("table")
-# for table in tables:
-#     table.decompose()
-# print(root)
+bfs(seed_url, KEYWORD)
 
