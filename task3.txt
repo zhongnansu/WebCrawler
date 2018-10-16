@@ -1,3 +1,4 @@
+https://en.wikipedia.org/wiki/Carbon_footprint
 https://en.wikipedia.org/wiki/Greenhouse_gas	1	1	1
 https://en.wikipedia.org/wiki/Life-cycle_greenhouse-gas_emissions_of_energy_sources	1	1	2
 https://en.wikipedia.org/wiki/Greenhouse_gas_footprint	1	1	3

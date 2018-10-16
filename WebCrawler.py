@@ -33,7 +33,9 @@ def bfs(seed, keyword):
     parameter_list = []
 
     q.appendleft(seed)
-    count = 0
+    result_url.append(seed)
+    parameter_list.append("0" + "\t" + "0" + "\t" + "0")
+    count = 1
     depth = 1
     url_index = 1
 
@@ -53,17 +55,21 @@ def bfs(seed, keyword):
             for table in tables:
                 table.decompose()
 
-            a_list = content.findAll('a', title=True)
+            a_list = content.findAll('a', href=True)
 
             for item in a_list:
 
                 href = item.get("href")
                 url = PREFIX + href
 
-                if (not href.startswith("/wiki")) or (":" in href) \
-                        or "class" in item.attrs and item["class"][0] == "external text" \
-                        or "#" in href:
+                if (not href.startswith("/wiki")) \
+                        or ("class" in item.attrs and item["class"][0] == "external text") \
+                        or ":" in href:
                     continue
+                # handle "#", get the base url
+                if "#" in href:
+                    url = PREFIX + href.split("#")[0]
+
                 # handle redirect_url
                 if "class" in item.attrs and item["class"][0] == "mw-redirect":
                     redirect_page = requests.get(url).text
@@ -118,7 +124,7 @@ def save_html(result_url):
         print("saving num " + str(index))
         response = requests.get(url).text
         time.sleep(1)
-        html = sp(response, "html.parser").text
+        html = str(sp(response, "html.parser"))
         html_path = html_folder_path + "/" + str(index) + ".txt"
         html_fw = open(html_path, "w")
         html_fw.write(html)
